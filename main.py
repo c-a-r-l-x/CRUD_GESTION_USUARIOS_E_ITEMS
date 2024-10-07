@@ -101,5 +101,36 @@ def registrar_usuario():
         finally:
             conexion.close()
 
+def verificar_contraseña(contraseña, hash_contraseña):
+    return bcrypt.checkpw(contraseña.encode('utf-8'), hash_contraseña)
+
+def iniciar_sesion():
+    conexion = conectar()
+    if conexion:
+        try:
+            username = input("Ingrese su nombre de usuario: ")
+            password = input("Ingrese su contraseña: ")
+
+            cursor = conexion.cursor()
+            cursor.execute("SELECT password, role_id FROM usuarios WHERE username = ?", (username,))
+            usuario = cursor.fetchone()
+
+            if usuario:
+                contraseña_encriptada, role_id = usuario
+                if verificar_contraseña(password, contraseña_encriptada):
+                    print("Inicio de sesión exitoso.")
+                    return role_id
+                else:
+                    print("Contraseña incorrecta.")
+            else:
+                print("Usuario no encontrado.")
+            return None
+        except sqlite3.Error as e:
+            print(f"Error al iniciar sesión: {e}.")
+            return None
+        finally:
+            conexion.close()
+
 crear_tablas()
 registrar_usuario()
+iniciar_sesion()

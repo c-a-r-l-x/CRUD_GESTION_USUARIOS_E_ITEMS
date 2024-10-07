@@ -1,4 +1,6 @@
 import sqlite3
+import re
+import bcrypt
 
 # conectarse a la base de datos:
 def conectar():
@@ -41,4 +43,63 @@ def crear_tablas():
         finally:
             conexion.close()
 
+def validar_username(username):
+    return len(username) >= 5 and len(username) <= 20
+
+def validar_password(password):
+    return len(password) >= 8 and re.search(r"[A-Za-z]", password) and re.search(r"[0-9]", password)
+
+def validar_email(email):
+    return re.match(r"[^@]+@[^@]+\.[^@]+", email)
+
+def encriptar_contraseña(contraseña):
+    salt = bcrypt.gensalt()
+    contraseña_encriptada = bcrypt.hashpw(contraseña.encode('utf-8'), salt)
+    return contraseña_encriptada
+
+def registrar_usuario():
+    conexion = conectar()
+    if conexion:
+        try:
+            username = input("Ingrese su nombre de usuario (5-20 caracteres): ")
+            if not validar_username(username):
+                print("El nombre de usuario debe tener entre 5 y 20 caracteres.")
+                return
+            
+            password = input("Ingrese su contraseña (mínimo 8 caracteres, con letras y números): ")
+            if not validar_password(password):
+                print("La contraseña debe tener al menos 8 caracteres, con al menos una letra y un número.")
+                return
+
+            email = input("Ingrese su email: ")
+            if not validar_email(email):
+                print("El formato del email no es válido.")
+                return
+            
+            # encriptar la contraseña:
+            password_encriptada = encriptar_contraseña(password)
+
+            # asignar el rol:
+            rol = input("Seleccione el rol (1 para Usuario General, 2 para Administrador): ")
+            if rol == '1':
+                rol_id = 1
+            elif rol == '2':
+                rol_id = 2
+            else:
+                print("Opción de rol no válida. Solo se permite 1 (Usuario General) o 2 (Administrador).")
+                return
+
+            cursor = conexion.cursor()
+            cursor.execute("INSERT INTO usuarios (username, password, email, role_id) VALUES (?, ?, ?, ?)", 
+                           (username, password_encriptada, email, rol_id))
+            conexion.commit()
+            print("Usuario registrado con éxito.")
+        except sqlite3.IntegrityError:
+            print("El nombre de usuario o email ya está en uso.")
+        except sqlite3.Error as e:
+            print(f"Error al registrar usuario: {e}.")
+        finally:
+            conexion.close()
+
 crear_tablas()
+registrar_usuario()

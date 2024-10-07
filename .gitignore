@@ -104,3 +104,7 @@ build/
 # SQLite database
 *.sqlite3
 *.db
+
+# Bcrypt
+*.log
+.bcrypt-random/

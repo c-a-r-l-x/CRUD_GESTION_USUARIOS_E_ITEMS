@@ -131,6 +131,26 @@ def iniciar_sesion():
         finally:
             conexion.close()
 
+def listar_usuarios():
+    conexion = conectar()
+    if conexion:
+        try:
+            cursor = conexion.cursor()
+            cursor.execute("SELECT username, email, role_id FROM usuarios")
+            usuarios = cursor.fetchall()
+
+            if usuarios:
+                print("\n--- Lista de Usuarios ---")
+                for usuario in usuarios:
+                    print(f"- Username: {usuario[0]} | Email: {usuario[1]} | Role ID: {usuario[2]}.")
+            else:
+                print("No hay usuarios registrados.")
+        except sqlite3.Error as e:
+            print(f"Error al listar usuarios: {e}.")
+        finally:
+            conexion.close()
+
 crear_tablas()
 registrar_usuario()
 iniciar_sesion()
+listar_usuarios()

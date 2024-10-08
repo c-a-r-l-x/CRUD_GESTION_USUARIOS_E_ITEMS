@@ -140,9 +140,9 @@ def listar_usuarios():
             usuarios = cursor.fetchall()
 
             if usuarios:
-                print("\n--- Lista de Usuarios ---")
+                print("--- Lista de Usuarios ---")
                 for usuario in usuarios:
-                    print(f"- Username: {usuario[0]} | Email: {usuario[1]} | Role ID: {usuario[2]}.")
+                    print(f"- Username: {usuario[0]} | Email: {usuario[1]} | Rol: {usuario[2]}.")
             else:
                 print("No hay usuarios registrados.")
         except sqlite3.Error as e:
@@ -150,7 +150,36 @@ def listar_usuarios():
         finally:
             conexion.close()
 
+def listar_usuarios_por_rol():
+    conexion = conectar()
+    if conexion:
+        try:
+            rol = input("Ingrese el rol (1 para Usuario General, 2 para Administrador): ")
+            if rol == '1':
+                rol_id = 1
+            elif rol == '2':
+                rol_id = 2
+            else:
+                print("Rol inválido. Solo se permiten 1 (Usuario General) o 2 (Administrador).")
+                return
+
+            cursor = conexion.cursor()
+            cursor.execute("SELECT username, email, role_id FROM usuarios WHERE role_id = ?", (rol_id,))
+            usuarios = cursor.fetchall()
+
+            if usuarios:
+                print(f"--- Lista de Usuarios con Rol {rol_id} ---")
+                for usuario in usuarios:
+                    print(f"- Username: {usuario[0]} | Email: {usuario[1]} | Rol: {usuario[2]}.")
+            else:
+                print(f"No hay usuarios con rol {rol_id}.")
+        except sqlite3.Error as e:
+            print(f"Error al listar usuarios por rol: {e}.")
+        finally:
+            conexion.close()
+
 crear_tablas()
 registrar_usuario()
 iniciar_sesion()
 listar_usuarios()
+listar_usuarios_por_rol()

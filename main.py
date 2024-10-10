@@ -231,9 +231,32 @@ def editar_usuario():
         finally:
             conexion.close()
 
+def eliminar_usuario():
+    conexion = conectar()
+    if conexion:
+        try:
+            username = input("Ingrese el nombre de usuario que desea eliminar: ")
+
+            cursor = conexion.cursor()
+            cursor.execute("SELECT * FROM usuarios WHERE username = ?", (username,))
+            usuario = cursor.fetchone()
+
+            if not usuario:
+                print(f"Usuario '{username}' no encontrado.")
+                return
+            
+            cursor.execute("DELETE FROM usuarios WHERE username = ?", (username,))
+            conexion.commit()
+            print(f"Usuario '{username}' eliminado con éxito.")
+        except sqlite3.Error as e:
+            print(f"Error al eliminar usuario: {e}.")
+        finally:
+            conexion.close()
+
 crear_tablas()
 registrar_usuario()
 iniciar_sesion()
 listar_usuarios()
 listar_usuarios_por_rol()
 editar_usuario()
+eliminar_usuario()

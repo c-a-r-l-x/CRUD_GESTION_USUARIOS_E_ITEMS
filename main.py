@@ -253,10 +253,73 @@ def eliminar_usuario():
         finally:
             conexion.close()
 
-crear_tablas()
-registrar_usuario()
-iniciar_sesion()
-listar_usuarios()
-listar_usuarios_por_rol()
-editar_usuario()
-eliminar_usuario()
+def menu():
+    crear_tablas()
+    role_id = None
+    
+    while True:
+        if role_id is None:
+            print("\n--- Menú Inicial ---")
+            print("1. Registrarse")
+            print("2. Iniciar sesión")
+            print("3. Salir")
+            opcion = input("Seleccione una opción: ")
+
+            if opcion == '1':
+                registrar_usuario()
+            elif opcion == '2':
+                role_id = iniciar_sesion()
+            elif opcion == '3':
+                print("Saliendo del sistema...")
+                break
+            else:
+                print("Opción no válida.")
+        else:
+            if role_id == 2:
+                print("\n--- Menú Administrador ---")
+                print("1. Listar usuarios")
+                print("2. Listar usuarios por rol")
+                print("3. Editar usuario")
+                print("4. Eliminar usuario")
+                print("5. Cerrar sesión")
+                print("6. Salir")
+                opcion = input("Seleccione una opción: ")
+
+                if opcion == '1':
+                    listar_usuarios()
+                elif opcion == '2':
+                    listar_usuarios_por_rol()
+                elif opcion == '3':
+                    editar_usuario()
+                elif opcion == '4':
+                    eliminar_usuario()
+                elif opcion == '5':
+                    role_id = None
+                    print("Sesión cerrada.")
+                elif opcion == '6':
+                    print("Saliendo del sistema...")
+                    break
+                else:
+                    print("Opción no válida.")
+            else:
+                print("\n--- Menú Usuario General ---")
+                print("1. Listar usuarios")
+                print("2. Listar usuarios por rol")
+                print("3. Cerrar sesión")
+                print("4. Salir")
+                opcion = input("Seleccione una opción: ")
+
+                if opcion == '1':
+                    listar_usuarios()
+                elif opcion == '2':
+                    listar_usuarios_por_rol()
+                elif opcion == '3':
+                    role_id = None
+                    print("Sesión cerrada.")
+                elif opcion == '4':
+                    print("Saliendo del sistema...")
+                    break
+                else:
+                    print("Opción no válida.")
+
+menu()
